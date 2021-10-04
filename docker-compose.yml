@@ -1,8 +1,8 @@
 version: '3.9'
 
 services:
-    flask-hello:
-        image: flask-hello:latest
+    zel_temperature:
+        image: zel_temperature:latest
         restart: always
         ports:
         - 8080:8080
