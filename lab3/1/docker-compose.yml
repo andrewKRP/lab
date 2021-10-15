@@ -1,1 +1,7 @@
-###
+version: "3.9"
+
+services:
+    architecture:
+        image: architecture:latest
+        restart: always
+       
