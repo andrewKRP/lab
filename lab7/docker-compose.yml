@@ -1,0 +1,61 @@
+version: '3.2'
+services:
+  mongo:
+    restart: 'always'
+    ports:
+    - '27017:27017'
+    image: bitnami/mongodb
+    container_name: mongo-container
+    volumes:
+    - ./mongdb:/data/db
+    networks:
+      mynetwork:
+        aliases:
+        - 'mongodb-service'
+  mongo_exporter:
+    restart: 'always'
+    ports:
+    - '9001:9001'
+    image: bitnami/mongodb-exporter 
+    container_name: mongo-exporter-container
+    #    environment:
+    #    - 'MONGO_SERVICE=mongodb-service'
+    #    - 'MONGO_PORT=27017'
+    depends_on:
+    - mongo
+    networks:
+      mynetwork:
+        aliases:
+        - 'mongodb-exporter-service'
+  grafana:
+    restart: 'always'
+    ports:
+    - '3000:3000'
+    image: grafana/grafana
+    container_name: grafana-container
+    volumes:
+    - ./grafana_datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
+    networks:
+      mynetwork:
+        aliases:
+        - 'grafana-service'
+  prometheus:
+    restart: 'always'
+    ports:
+    - '9090:9090'
+    image: prom/prometheus
+    container_name: prometheus-container
+    command:
+    - --config.file=/prometheus/config/prometheus.yaml
+      #    - '--storage.tsdb.path=/data'
+    volumes:
+    - ./config:/prometheus/config
+    depends_on:
+    - mongo_exporter
+    networks:
+      mynetwork:
+        aliases:
+        - 'prometheus-service'
+networks:
+  mynetwork:
+          driver: bridge
